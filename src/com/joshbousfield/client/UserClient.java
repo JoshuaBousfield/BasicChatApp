@@ -21,15 +21,19 @@ public class UserClient {
             PrintWriter command = new PrintWriter(socket.getOutputStream(), true);
             //send the name to the server
             sendCommand(name, command);
-            new Thread(new UserClientReceive(socket)).start();
+            UserClientReceive receive = new UserClientReceive(socket);
+            new Thread(receive).start();
             Scanner scanner = new Scanner(System.in);
             String commandString;
-
-            while(true) {
-                //will need an auto /w
+            do {
                 commandString = scanner.nextLine();
+                //turn off server receive thread
+                if (commandString.equals("/q")) {
+                    receive.stop();
+                }
                 sendCommand(commandString, command);
-            }
+
+            } while(!commandString.equals("/q"));
 
         } catch (IOException e) {
             e.printStackTrace();

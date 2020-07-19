@@ -6,23 +6,29 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class UserClientReceive implements Runnable {
-    private Socket socket;
+    private final Socket socket;
+    private boolean running;
 
     public UserClientReceive(Socket socket) {
         this.socket = socket;
+        this.running = true;
     }
 
     @Override
     public void run() {
         String receivableMessage;
-        while(true) {
-            try {
-                BufferedReader server = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        try {
+            BufferedReader server = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            while (running) {
                 receivableMessage = server.readLine();
                 System.out.println(receivableMessage);
-            } catch (IOException e) {
-                System.out.println("IOException in  UserClientReceive: " + e.getMessage());
             }
+        } catch (IOException e) {
+            System.out.println("IOException in UserClientReceive: " + e.getMessage());
         }
+    }
+
+    public void stop() {
+        running = false;
     }
 }
